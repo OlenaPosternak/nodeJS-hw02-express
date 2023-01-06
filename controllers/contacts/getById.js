@@ -1,11 +1,10 @@
 const createError = require("http-errors");
-const { getContactById } = require("../../models/contacts");
+const { Contact } = require("../../models/contacts");
 
 const getById = async (req, res, next) => {
   try {
     const id = req.params.contactId;
-    const contactById = await getContactById(id);
-
+    const contactById = await Contact.findById(id);
     if (!contactById) {
       throw createError(404, `Invalid contact id = ${id}`);
     } else {

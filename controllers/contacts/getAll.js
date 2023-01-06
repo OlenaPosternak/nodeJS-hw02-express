@@ -1,14 +1,14 @@
-const { listContacts } = require("../../models/contacts");
+const { Contact } = require("../../models/contacts");
 
 const getAll = async (req, res, next) => {
   try {
-    const result = await listContacts();
+    const contacts = await Contact.find({}, "name email phone favorite");
 
     res.json({
       status: "success",
       code: 200,
       data: {
-        result,
+        contacts,
       },
     });
   } catch (error) {
