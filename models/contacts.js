@@ -1,67 +1,60 @@
-const fs = require("fs/promises");
-const path = require("path");
-const { nanoid } = require("nanoid");
+const { Schema, model, MongooseError } = require("mongoose");
+const Joi = require("joi");
 
-const contactsPath = path.join(__dirname, "./contacts.json");
+const contactsSchema = Schema(
+  {
+    name: {
+      type: String,
+      required: [true, "Set name for contact"],
+      unique: [true, "Contact with current name already exists"],
+    },
+    email: {
+      type: String,
+    },
+    phone: {
+      type: String,
+      required: [true, "Set phone number for contact"],
+      // match: /^(\d{3}) \d{3}-\d{4}$/,
+    },
+    favorite: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  { versionKey: false, timestamps: true }
+);
 
-const listContacts = async () => {
-  const data = await fs.readFile(contactsPath);
-  const contacts = JSON.parse(data);
-  return contacts;
-};
-
-const getContactById = async (contactId) => {
-  const data = await listContacts();
-  const contactByID = await data.find(
-    (item) => item.id === contactId.toString()
-  );
-  return contactByID;
-};
-
-const removeContact = async (contactId) => {
-  const data = await listContacts();
-  const indx = await data.findIndex((item) => item.id === contactId.toString());
-  if (indx === -1) {
-    return null;
+const hadlerError = (error, data, next) => {
+  const { name, code } = error;
+  if (name === "MongoServerError" && code === 11000) {
+    error.status = 409;
+  } else {
+    error.status = 400;
   }
-  const removeItem = data.splice(indx, 1);
-  const newContacts = await data.filter((item) => item.id !== contactId);
-  await fs.writeFile(contactsPath, JSON.stringify(newContacts));
-
-  return removeItem;
+  next();
 };
 
-const addContact = async (body) => {
-  const id = nanoid();
-  const newContact = {
-    id,
-    ...body,
-  };
-  console.log(`new`, newContact);
-  const data = await listContacts();
-  data.push(newContact);
-  await fs.writeFile(contactsPath, JSON.stringify(data));
-  return newContact;
-};
+contactsSchema.post("save", hadlerError);
 
-const updateContact = async (contactId, body) => {
-  const newContact = {
-    ...body,
-  };
-  const data = await listContacts();
-  data.forEach((element) => {
-    if (element.id === contactId) {
-      element = newContact;
-    }
-  });
-  await fs.writeFile(contactsPath, JSON.stringify(data));
-  return newContact;
+const Contact = model("contact", contactsSchema);
+
+const contactsSchemaJoi = Joi.object({
+  name: Joi.string().required(),
+  email: Joi.string().required(),
+  phone: Joi.string().required(),
+  favorite: Joi.boolean(),
+});
+
+const updateFavoriteSchemaJoi = Joi.object({
+  favorite: Joi.boolean().required(),
+});
+
+const schemas = {
+  contactsSchemaJoi,
+  updateFavoriteSchemaJoi
 };
 
 module.exports = {
-  listContacts,
-  getContactById,
-  removeContact,
-  addContact,
-  updateContact,
+  Contact,
+  schemas,
 };

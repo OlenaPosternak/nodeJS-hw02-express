@@ -1,12 +1,13 @@
 const createError = require("http-errors");
 const { Contact } = require("../../models/contacts");
 
-const update = async (req, res, next) => {
+const updateStatusContact = async (req, res, next) => {
   try {
     const id = req.params.contactId;
     const updatedContact = await Contact.findByIdAndUpdate(id, req.body, {
       new: true,
     });
+
     if (!updatedContact) {
       throw createError(404, `Invalid contact id ${id}`);
     }
@@ -22,4 +23,4 @@ const update = async (req, res, next) => {
   }
 };
 
-module.exports = update;
+module.exports = updateStatusContact;
