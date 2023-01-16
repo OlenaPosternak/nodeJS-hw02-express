@@ -3,8 +3,14 @@ const { Contact } = require("../../models/contacts");
 
 const getById = async (req, res, next) => {
   try {
-    const id = req.params.contactId;
-    const contactById = await Contact.findById(id);
+    const contactId = req.params.contactId;
+    const { _id } = req.user;
+
+    const contactById = await Contact.findOne({
+      _id: contactId,
+      owner: _id,
+    }).populate("owner", "_id email subscription");
+
     if (!contactById) {
       throw createError(404, `Invalid contact id = ${id}`);
     } else {

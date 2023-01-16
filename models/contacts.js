@@ -1,4 +1,4 @@
-const { Schema, model, MongooseError } = require("mongoose");
+const { Schema, model } = require("mongoose");
 const Joi = require("joi");
 
 const contactsSchema = Schema(
@@ -20,6 +20,11 @@ const contactsSchema = Schema(
       type: Boolean,
       default: false,
     },
+    owner:{
+        type: Schema.Types.ObjectId,
+        ref: 'user',
+      
+    }
   },
   { versionKey: false, timestamps: true }
 );
@@ -51,7 +56,7 @@ const updateFavoriteSchemaJoi = Joi.object({
 
 const schemas = {
   contactsSchemaJoi,
-  updateFavoriteSchemaJoi
+  updateFavoriteSchemaJoi,
 };
 
 module.exports = {
