@@ -6,12 +6,13 @@ const userSchema = Schema(
     password: {
       type: String,
       required: [true, "Set password for user"],
-      minlength: 6,
+      minlength: [6, "Password should be at least 6 characters"],
     },
     email: {
       type: String,
       required: [true, "Email is required"],
       unique: true,
+      match: [/^[a-z0-9]+@[a-z0-9]+/, "user email is not valid"],
     },
     subscription: {
       type: String,
@@ -19,6 +20,9 @@ const userSchema = Schema(
       default: "starter",
     },
     token: {
+      type: String,
+    },
+    avatarURL: {
       type: String,
     },
   },
