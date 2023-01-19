@@ -12,7 +12,6 @@ const userSchema = Schema(
       type: String,
       required: [true, "Email is required"],
       unique: true,
-      match: [/^[a-z0-9]+@[a-z0-9]+/, "user email is not valid"],
     },
     subscription: {
       type: String,

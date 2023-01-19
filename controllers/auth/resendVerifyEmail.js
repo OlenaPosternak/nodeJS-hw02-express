@@ -1,7 +1,10 @@
 const { User } = require("../../models/user");
 const createError = require("http-errors");
+require("dotenv").config();
 
-const sendEmail = require("../../helpers/sendEmail");
+const { LOCAL_HOST } = process.env;
+
+const sendEmail = require("../../helpers/sendMail");
 
 const resendVerifyEmail = async (req, res, next) => {
   try {
@@ -17,7 +20,7 @@ const resendVerifyEmail = async (req, res, next) => {
       to: email,
       subject: "Confirmation of registering",
       text: "Please confirm your registration",
-      html: `<a href ="http://localhost:3000/api/users/verify/:verificationToken${user.verificationToken}" target="_blank"> Please confirm registration</a>`,
+      html: `<a href ="http://${LOCAL_HOST}/api/users/verify/:verificationToken${user.verificationToken}" target="_blank"> Please confirm registration</a>`,
     };
     await sendEmail(mail);
 
