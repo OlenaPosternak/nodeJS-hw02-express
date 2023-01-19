@@ -1,6 +1,7 @@
 const { Unauthorized } = require("http-errors");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const createError = require("http-errors");
 
 require("dotenv").config();
 const { SECRET_KEY } = process.env;
@@ -17,6 +18,10 @@ const login = async (req, res, next) => {
     const comparePassword = bcrypt.compareSync(password, user.password);
     if (!comparePassword) {
       throw new Unauthorized("Email or password is wrong");
+    }
+
+    if (!user.verify) {
+      throw createError(400, `Email not verify`);
     }
 
     const token = jwt.sign({ id: user._id }, SECRET_KEY, { expiresIn: "2h" });
