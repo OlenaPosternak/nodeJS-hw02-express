@@ -12,7 +12,6 @@ const userSchema = Schema(
       type: String,
       required: [true, "Email is required"],
       unique: true,
-      match: [/^[a-z0-9]+@[a-z0-9]+/, "user email is not valid"],
     },
     subscription: {
       type: String,
@@ -25,6 +24,14 @@ const userSchema = Schema(
     avatarURL: {
       type: String,
     },
+    verify: {
+      type: Boolean,
+      default: false,
+    },
+    verificationToken: {
+      type: String,
+      required: [true, "Verify token is required"],
+    },
   },
   { versionKey: false, timestamps: true }
 );
@@ -35,6 +42,11 @@ const userRegisterSchemaJoi = Joi.object({
   password: Joi.string().min(6).required(),
   email: Joi.string().required(),
 });
+
+const userVerifyEmailJoi = Joi.object({
+    email: Joi.string().required(),
+  });
+
 
 const userLoginSchemaJoi = Joi.object({
   password: Joi.string().required(),
@@ -49,6 +61,7 @@ const schemas = {
   userRegisterSchemaJoi,
   userLoginSchemaJoi,
   userSubscriptionSchemaJoi,
+  userVerifyEmailJoi,
 };
 
 module.exports = {
